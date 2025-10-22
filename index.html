@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <title>Esperienza AR Interattiva</title>
+  <style>
+    :root {
+      --primary: #0078ff;
+      --bg: #f4f7fa;
+      --card-bg: #fff;
+      --text: #333;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      color: var(--primary);
+      font-size: 1.6em;
+      margin-top: 20px;
+    }
+
+    #status {
+      margin-bottom: 10px;
+      font-size: 1em;
+      color: var(--text);
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 400px;
+      background-color: #f0f0f0;
+      border-bottom: 1px solid #eee;
+      cursor: grab;
+    }
+
+    #qrcode-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #qrcode-container h2 {
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    #qrcode {
+      padding: 10px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      font-size: 0.8em;
+      color: #777;
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Esperienza AR Interattiva</h1>
+    <div id="status">Controllo compatibilità AR...</div>
+
+    <model-viewer
+      id="model"
+      src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+      alt="Astronauta 3D"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1">
+    </model-viewer>
+
+    <div id="qrcode-container">
+      <h2>📱 Scansiona il QR per vederlo in AR</h2>
+      <div id="qrcode"></div>
+    </div>
+
+    <footer>Progetto demo AR – Powered by &lt;model-viewer&gt;</footer>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+    const model = document.getElementById('model');
+    const qrcodeContainer = document.getElementById('qrcode-container');
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /android|iphone|ipad/.test(ua);
+    const isAndroid = /android/.test(ua) && /chrome/.test(ua);
+    const isIOS = /iphone|ipad/.test(ua);
+
+    window.addEventListener('load', () => {
+      if (isMobile) {
+        qrcodeContainer.style.display = 'none';
+        if (isAndroid) {
+          if (model.activateAR) model.activateAR();
+          status.textContent = "✅ AR avviato automaticamente su Android";
+        } else if (isIOS) {
+          status.textContent = "ℹ️ AR su iOS richiede un tap per avviare Quick Look";
+        } else {
+          status.textContent = "❌ AR non disponibile su questo dispositivo";
+        }
+      } else {
+        // Desktop: genera QR code verso la pagina con AR tap anywhere
+        new QRCode(document.getElementById("qrcode"), {
+          text: "https://tuosito.it/ar-tap-anywhere.html", // <-- nuova pagina
+          width: 160,
+          height: 160
+        });
+        if (navigator.xr) {
+          navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+            if (supported) status.textContent = "✅ AR compatibile tramite WebXR";
+            else status.textContent = "ℹ️ Scansiona il QR per provare AR su mobile";
+          });
+        } else {
+          status.textContent = "ℹ️ Scansiona il QR per provare AR su mobile";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
