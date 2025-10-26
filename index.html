@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>KTX2 Skybox con OrbitControls</title>
+  <title>KTX2 Skybox GitHub Pages</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -33,6 +33,7 @@
   const ktx2Loader = new KTX2Loader();
   ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.164.0/examples/js/libs/basis/');
 
+  // Carica la cubemap KTX2
   ktx2Loader.load('skybox.ktx2', (texture) => {
       texture.encoding = THREE.sRGBEncoding;
       texture.isCubemap = true;
@@ -59,5 +60,3 @@
 </script>
 </body>
 </html>
-
-
